@@ -1,0 +1,82 @@
+`timescale 1ns/1ps
+
+module microprocessor_tb;
+
+reg clk1, clk2;
+
+// Instantiate the processor
+microprocessor_32bits uut(clk1, clk2);
+
+// Clock generation
+initial begin
+    clk1 = 0; clk2 = 0;
+    forever begin
+        #5 clk1 = ~clk1;
+        #5 clk2 = ~clk2;
+    end
+end
+
+// Initialize memory and instructions
+initial begin
+    // Display instructions to user
+    $display("32-bit Microprocessor Testbench");
+    $display("Available Operations:");
+    $display("1. ADD  (Reg[1] = Reg[2] + Reg[3])");
+    $display("2. SUB  (Reg[4] = Reg[5] - Reg[6])");
+    $display("3. MUL  (Reg[7] = Reg[8] * Reg[9])");
+    $display("4. AND  (Reg[10] = Reg[11] & Reg[12])");
+    $display("5. OR   (Reg[13] = Reg[14] | Reg[15])");
+    $display("6. HLT  (Stop Execution)");
+    $display("NOTE: Modify testbench file to select desired operation before running simulation.");
+    
+    // Initialize registers for testing
+    uut.Reg[2] = 10;  // For ADD
+    uut.Reg[3] = 20;
+    uut.Reg[5] = 50;  // For SUB
+    uut.Reg[6] = 15;
+    uut.Reg[8] = 4;   // For MUL
+    uut.Reg[9] = 5;
+    uut.Reg[11] = 8'b1100;  // For AND
+    uut.Reg[12] = 8'b1010;
+    uut.Reg[14] = 8'b1100;  // For OR
+    uut.Reg[15] = 8'b1010;
+
+    // Load instructions into memory (choose one or multiple manually)
+
+    // Example: ADD Reg[1] = Reg[2] + Reg[3]
+    uut.Mem[0] = {6'b000000, 5'd2, 5'd3, 5'd1, 11'd0}; // ADD R1 = R2 + R3
+
+    // Example: SUB Reg[4] = Reg[5] - Reg[6]
+    uut.Mem[1] = {6'b000001, 5'd5, 5'd6, 5'd4, 11'd0}; // SUB R4 = R5 - R6
+
+    // Example: MUL Reg[7] = Reg[8] * Reg[9]
+    uut.Mem[2] = {6'b000101, 5'd8, 5'd9, 5'd7, 11'd0}; // MUL R7 = R8 * R9
+
+    // Example: AND Reg[10] = Reg[11] & Reg[12]
+    uut.Mem[3] = {6'b000010, 5'd11, 5'd12, 5'd10, 11'd0}; // AND R10 = R11 & R12
+
+    // Example: OR Reg[13] = Reg[14] | Reg[15]
+    uut.Mem[4] = {6'b000011, 5'd14, 5'd15, 5'd13, 11'd0}; // OR R13 = R14 | R15
+
+    // Halt instruction
+    uut.Mem[5] = {6'b111111, 26'd0};
+
+    // Start simulation
+    #1000; // Let the simulation run for some time
+
+    // Display results
+    $display("Register Dump after Execution:");
+    $display("R1 (ADD): %d", uut.Reg[1]);
+    $display("R4 (SUB): %d", uut.Reg[4]);
+    $display("R7 (MUL): %d", uut.Reg[7]);
+    $display("R10 (AND): %b", uut.Reg[10]);
+    $display("R13 (OR): %b", uut.Reg[13]);
+    $display("Zero Flag: %b", uut.ZF);
+    $display("Sign Flag: %b", uut.SF);
+    $display("Carry Flag: %b", uut.CF);
+    $display("Overflow Flag: %b", uut.OF);
+
+    $finish;
+end
+
+endmodule
