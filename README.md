@@ -36,3 +36,4 @@ Register File provides operands
 ALU performs operation
 Memory access (if required)
 Result written back to register
+
